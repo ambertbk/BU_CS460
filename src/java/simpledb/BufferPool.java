@@ -2,6 +2,7 @@ package simpledb;
 
 import java.io.*;
 
+import java.nio.Buffer;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -26,6 +27,9 @@ public class BufferPool {
     constructor instead. */
     public static final int DEFAULT_PAGES = 50;
 
+
+    private BufferPool bufferPool;
+    private final int numPages;
     /**
      * Creates a BufferPool that caches up to numPages pages.
      *
@@ -33,6 +37,7 @@ public class BufferPool {
      */
     public BufferPool(int numPages) {
         // some code goes here
+        this.numPages = numPages;
     }
     
     public static int getPageSize() {

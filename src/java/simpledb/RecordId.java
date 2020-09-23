@@ -10,6 +10,10 @@ public class RecordId implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private PageId pageId;
+
+    private int tupleNo;
+
     /**
      * Creates a new RecordId referring to the specified PageId and tuple
      * number.
@@ -21,22 +25,22 @@ public class RecordId implements Serializable {
      */
     public RecordId(PageId pid, int tupleno) {
         // some code goes here
+        pageId = pid;
+        tupleNo = tupleno;
     }
 
     /**
      * @return the tuple number this RecordId references.
      */
     public int tupleno() {
-        // some code goes here
-        return 0;
+        return tupleNo;
     }
 
     /**
      * @return the page id this RecordId references.
      */
     public PageId getPageId() {
-        // some code goes here
-        return null;
+        return pageId;
     }
 
     /**
@@ -47,8 +51,14 @@ public class RecordId implements Serializable {
      */
     @Override
     public boolean equals(Object o) {
-        // some code goes here
-        throw new UnsupportedOperationException("implement this");
+        if (o == null){
+            return pageId == null;
+        } else {
+            return o instanceof RecordId &&
+                   ((RecordId)o).pageId == pageId &&
+                   ((RecordId)o).tupleNo == tupleNo;
+        }
+
     }
 
     /**
@@ -59,9 +69,9 @@ public class RecordId implements Serializable {
      */
     @Override
     public int hashCode() {
-        // some code goes here
-        throw new UnsupportedOperationException("implement this");
-
+        return String.valueOf(pageId.hashCode())
+                .concat(String.valueOf(tupleNo))
+                .hashCode();
     }
 
 }

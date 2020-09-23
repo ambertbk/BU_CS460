@@ -3,8 +3,10 @@ package simpledb;
 import com.sun.prism.impl.Disposer;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Tuple maintains information about the contents of a tuple. Tuples have a
@@ -30,6 +32,7 @@ public class Tuple implements Serializable {
      */
     public Tuple(TupleDesc td) {
         tupleDesc = td;
+        fields = new Field[td.numFields()];
     }
 
     /**
@@ -66,8 +69,8 @@ public class Tuple implements Serializable {
      *            new value for the field.
      */
     public void setField(int i, Field f) {
-        if (i < 0 || i > fields.length){
-            throw new IllegalArgumentException("invalid index");
+        if (!isValid(i)){
+            throw new NoSuchElementException("invalid index");
         }
         fields[i] = f;
     }
@@ -79,6 +82,9 @@ public class Tuple implements Serializable {
      *            field index to return. Must be a valid index.
      */
     public Field getField(int i) {
+        if (!isValid(i)){
+            throw new IllegalArgumentException("invalid index");
+        }
         return fields[i];
     }
 
@@ -86,14 +92,21 @@ public class Tuple implements Serializable {
      * Returns the contents of this Tuple as a string. Note that to pass the
      * system tests, the format needs to be as follows:
      *
-     * column1\tcolumn2\tcolumn3\t...\tcolumnN
+     * column1 \t column2 \t column3 \t ... \t columnN
      *
      * where \t is any whitespace (except a newline)
      */
     public String toString() {
-        throw new UnsupportedOperationException("Implement this");
-
-
+//        throw new UnsupportedOperationException("Implement this");
+        StringBuffer rows = new StringBuffer();
+        for (int i = 0; i < fields.length; i ++){
+            if (i== fields.length - 1){
+                rows.append(fields[i].toString() + "\n");
+            } else {
+                rows.append(fields[i].toString() + "\t");
+            }
+        }
+        return rows.toString();
     }
 
     /**
@@ -102,15 +115,46 @@ public class Tuple implements Serializable {
      * */
     public Iterator<Field> fields()
     {
-        // some code goes here
-        return null;
+        return new FieldIterator();
     }
 
     /**
-     * reset the TupleDesc of thi tuple
+     * reset the TupleDesc of the tuple
      * */
     public void resetTupleDesc(TupleDesc td)
     {
-        // some code goes here
+        tupleDesc = td;
+        fields = new Field[td.numFields()];
+
+        for (int i = 0; i < td.numFields(); i ++){
+            fields[i] = null;
+        }
+
+    }
+
+    private boolean isValid(int index){
+        if (fields != null){
+            return (index >= 0 && index < fields.length);
+        } else {
+            return false;
+        }
+    }
+
+    private class FieldIterator implements Iterator<Field>{
+
+        private int pos = 0;
+
+        @Override
+        public boolean hasNext() {
+            return fields.length > pos;
+        }
+
+        @Override
+        public Field next() {
+            if (!hasNext()){
+                throw new NoSuchElementException("No fields!");
+            }
+            return fields[pos++];
+        }
     }
 }
