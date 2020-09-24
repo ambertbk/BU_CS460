@@ -24,7 +24,6 @@ public class RecordId implements Serializable {
      *            the tuple number within the page.
      */
     public RecordId(PageId pid, int tupleno) {
-        // some code goes here
         pageId = pid;
         tupleNo = tupleno;
     }

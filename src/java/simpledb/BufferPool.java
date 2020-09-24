@@ -28,9 +28,6 @@ public class BufferPool {
     constructor instead. */
     public static final int DEFAULT_PAGES = 50;
 
-    private final Page[] buffer;
-    private int evictIndex = 0;
-
 
     private pageBufferPool bufferPool;
     private final int numPages;
@@ -43,9 +40,6 @@ public class BufferPool {
         this.numPages = numPages;
 
         bufferPool = new pageBufferPool(numPages);
-
-        // ver2
-        buffer = new Page[numPages];
     }
     
     public static int getPageSize() {
@@ -92,18 +86,6 @@ public class BufferPool {
             bufferPool.putPage(page.getId(),page);
             return page;
         }
-
-        // ver 2
-//        int index = -1;
-//        for (int i = 0; i < buffer.length; i ++){
-//            if (buffer[i] == null){
-//                index = i;
-//            } else if (pid.equals(buffer[i].getId())){
-//                try {
-//
-//                }
-//            }
-//        }
     }
 
     /**
@@ -245,7 +227,7 @@ public class BufferPool {
      * Discards a page from the buffer pool.
      * Flushes the page to disk to ensure dirty pages are updated on disk.
      */
-    private synchronized  void evictPage() throws DbException {
+    private synchronized void evictPage() throws DbException {
         Page page = bufferPool.evictPage();
         PageId pid = page.getId();
         try {
@@ -257,8 +239,6 @@ public class BufferPool {
             throw new DbException("");
         }
     }
-
-
 
 
     // For convenience

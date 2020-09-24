@@ -64,7 +64,7 @@ public class HeapFile implements DbFile {
     // see DbFile.java for javadocs
     public Page readPage(PageId pid) {
         int tableId = pid.getTableId();
-        int pNo = pid.pageNumber();
+        int pageNumber = pid.pageNumber();
         int size = Database.getBufferPool().getPageSize();
 
         byte[] data = HeapPage.createEmptyPageData();
@@ -73,9 +73,9 @@ public class HeapFile implements DbFile {
         try {
             input = new FileInputStream(file);
             try{
-                input.skip(pNo * size);
+                input.skip(pageNumber * size);
                 input.read(data);
-                return new HeapPage(new HeapPageId(tableId, pNo),data);
+                return new HeapPage(new HeapPageId(tableId, pageNumber),data);
             }catch (IOException e){
                 throw new IllegalArgumentException("");
             }
@@ -87,7 +87,7 @@ public class HeapFile implements DbFile {
     // see DbFile.java for javadocs
     public void writePage(Page page) throws IOException {
         PageId pageId = page.getId();
-        int tableId = pageId.getTableId();
+//        int tableId = pageId.getTableId();
         int pNo = pageId.pageNumber();
 
         final int size = Database.getBufferPool().getPageSize();
@@ -166,7 +166,7 @@ public class HeapFile implements DbFile {
         RecordId rid = t.getRecordId();
         HeapPageId pid = (HeapPageId) rid.getPageId();
         if (pid.getTableId() == getId()){
-            int pageNo = pid.pageNumber();
+//            int pageNo = pid.pageNumber();
             HeapPage page = (HeapPage) Database.getBufferPool().getPage(tid,pid,Permissions.READ_WRITE);
             page.deleteTuple(t);
             deleted.add(page);
