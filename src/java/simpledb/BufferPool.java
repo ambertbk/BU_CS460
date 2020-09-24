@@ -28,6 +28,9 @@ public class BufferPool {
     constructor instead. */
     public static final int DEFAULT_PAGES = 50;
 
+    private final Page[] buffer;
+    private int evictIndex = 0;
+
 
     private pageBufferPool bufferPool;
     private final int numPages;
@@ -38,7 +41,11 @@ public class BufferPool {
      */
     public BufferPool(int numPages) {
         this.numPages = numPages;
-        this.bufferPool = new pageBufferPool(numPages);
+
+        bufferPool = new pageBufferPool(numPages);
+
+        // ver2
+        buffer = new Page[numPages];
     }
     
     public static int getPageSize() {
@@ -85,6 +92,18 @@ public class BufferPool {
             bufferPool.putPage(page.getId(),page);
             return page;
         }
+
+        // ver 2
+//        int index = -1;
+//        for (int i = 0; i < buffer.length; i ++){
+//            if (buffer[i] == null){
+//                index = i;
+//            } else if (pid.equals(buffer[i].getId())){
+//                try {
+//
+//                }
+//            }
+//        }
     }
 
     /**

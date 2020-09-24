@@ -1,10 +1,6 @@
 package simpledb;
 
-import com.sun.prism.impl.Disposer;
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 

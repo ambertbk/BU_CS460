@@ -48,7 +48,7 @@ public class HeapPage implements Page {
         header = new byte[getHeaderSize()];
         for (int i=0; i<header.length; i++)
             header[i] = dis.readByte();
-        
+
         tuples = new Tuple[numSlots];
         try{
             // allocate and read the actual records of this page
@@ -63,8 +63,8 @@ public class HeapPage implements Page {
     }
 
     /** Retrieve the number of tuples on this page.
-        @return the number of tuples on this page
-    */
+     @return the number of tuples on this page
+     */
     private int getNumTuples() {
         return (BufferPool.getPageSize() * 8) / (td.getSize() * 8 + 1);
     }
@@ -76,11 +76,11 @@ public class HeapPage implements Page {
     private int getHeaderSize() {
 //        return (getNumTuples() + 7)/8;
 
-        return (int)Math.ceil(getNumTuples()/8);
+        return (int)Math.ceil(getNumTuples()/8.0);
     }
-    
+
     /** Return a view of this page before it was modified
-        -- used by recovery */
+     -- used by recovery */
     public HeapPage getBeforeImage(){
         try {
             byte[] oldDataRef = null;
@@ -96,11 +96,11 @@ public class HeapPage implements Page {
         }
         return null;
     }
-    
+
     public void setBeforeImage() {
         synchronized(oldDataLock)
         {
-        oldData = getPageData().clone();
+            oldData = getPageData().clone();
         }
     }
 
@@ -192,7 +192,7 @@ public class HeapPage implements Page {
                 Field f = tuples[i].getField(j);
                 try {
                     f.serialize(dos);
-                
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -318,10 +318,9 @@ public class HeapPage implements Page {
      * Returns true if associated slot on this page is filled.
      */
     public boolean isSlotUsed(int i) {
-        if (i < numSlots){
-            return (header[i/8] & (0x1 << (i%8))) != 0;
-        }
-        return false;
+        int byteNum = i / 8;
+        int bytePos = i % 8;
+        return (byte)(header[byteNum] << (7 - bytePos)) < 0;
     }
 
     /**
