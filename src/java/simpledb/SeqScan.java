@@ -10,6 +10,10 @@ import java.util.*;
 public class SeqScan implements DbIterator {
 
     private static final long serialVersionUID = 1L;
+    private TransactionId tid;
+    private int tableid;
+    private String tableAlias;
+    private DbFileIterator dbiterator;
 
     /**
      * Creates a sequential scan over the specified table as a part of the
@@ -29,6 +33,11 @@ public class SeqScan implements DbIterator {
      */
     public SeqScan(TransactionId tid, int tableid, String tableAlias) {
         // some code goes here
+        this.tid = tid;
+        this.tableid = tableid;
+        this.tableAlias = tableAlias;
+        DbFile dbf = Database.getCatalog().getDatabaseFile(tableid);
+        this.dbiterator = dbf.iterator(tid);
     }
 
     /**
@@ -43,10 +52,9 @@ public class SeqScan implements DbIterator {
     /**
      * @return Return the alias of the table this operator scans.
      * */
-    public String getAlias()
-    {
+    public String getAlias() {
         // some code goes here
-        return null;
+        return this.tableAlias;
     }
 
     /**
@@ -63,6 +71,8 @@ public class SeqScan implements DbIterator {
      */
     public void reset(int tableid, String tableAlias) {
         // some code goes here
+        this.tableid = tableid;
+        this.tableAlias = tableAlias;
     }
 
     public SeqScan(TransactionId tid, int tableid) {
@@ -71,6 +81,11 @@ public class SeqScan implements DbIterator {
 
     public void open() throws DbException, TransactionAbortedException {
         // some code goes here
+        try {
+            dbiterator.open();
+        } catch (TransactionAbortedException e) {
+            throw new TransactionAbortedException();
+        }
     }
 
     /**
@@ -85,26 +100,68 @@ public class SeqScan implements DbIterator {
      */
     public TupleDesc getTupleDesc() {
         // some code goes here
-        return null;
+        TupleDesc to_change = Database.getCatalog().getDatabaseFile(tableid).getTupleDesc();
+        int tuple_length = to_change.numFields();
+        Type[] typeAr = new Type[tuple_length];
+        String[] fieldAr = new String[tuple_length];
+        for (int i=0; i<tuple_length; i++) {
+            try {
+                fieldAr[i] = tableAlias + "." + to_change.getFieldName(i);  //get the type name
+                //then get the fieldType
+                typeAr[i] = to_change.getFieldType(i);
+            } catch (NoSuchElementException e) {
+                fieldAr[i] = tableAlias + "." + "null";
+                typeAr[i] = null;
+            }
+        }
+        TupleDesc result = new TupleDesc(typeAr, fieldAr);
+        return result;
     }
 
     public boolean hasNext() throws TransactionAbortedException, DbException {
         // some code goes here
-        return false;
+        try {
+            if (dbiterator.hasNext()) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (TransactionAbortedException e) {
+            throw new TransactionAbortedException();
+        } catch (DbException e) {
+            throw new TransactionAbortedException();
+        } catch (NoSuchElementException e) {
+            throw new TransactionAbortedException();
+        }
     }
 
     public Tuple next() throws NoSuchElementException,
             TransactionAbortedException, DbException {
         // some code goes here
-        return null;
+        try {
+            if (dbiterator.hasNext()) {
+                Tuple result = dbiterator.next();
+                return result;
+            } else {
+                throw new NoSuchElementException();
+            }
+        } catch (TransactionAbortedException e) {
+            throw new NoSuchElementException();
+        } catch (DbException e) {
+            throw new NoSuchElementException();
+        } catch (NoSuchElementException e) {
+            throw new NoSuchElementException();
+        }
     }
 
     public void close() {
         // some code goes here
+        dbiterator.close();
     }
 
     public void rewind() throws DbException, NoSuchElementException,
             TransactionAbortedException {
         // some code goes here
+        dbiterator.rewind();
     }
 }

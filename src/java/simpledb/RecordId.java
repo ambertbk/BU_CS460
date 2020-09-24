@@ -51,14 +51,14 @@ public class RecordId implements Serializable {
      */
     @Override
     public boolean equals(Object o) {
-        if (o == null){
-            return pageId == null;
+        if (o == this){
+            return true;
+        } else if (o instanceof RecordId){
+            RecordId oId = ((RecordId)o);
+            return pageId.equals(oId.getPageId()) && oId.tupleno() == tupleNo;
         } else {
-            return o instanceof RecordId &&
-                   ((RecordId)o).pageId == pageId &&
-                   ((RecordId)o).tupleNo == tupleNo;
+            return false;
         }
-
     }
 
     /**
